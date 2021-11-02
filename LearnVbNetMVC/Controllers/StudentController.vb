@@ -3,15 +3,16 @@
 Namespace Controllers
     Public Class StudentController
         Inherits Controller
+        Private db As StudentDBEntities = New StudentDBEntities()
 
 
         ' GET: Student
         Function Index() As ActionResult
-            Return View(studentList.OrderBy(Function(s) s.StudentName).ToList())
+            Return View(db.Students.OrderBy(Function(s) s.studentName).ToList())
         End Function
 
         Function Edit(ByVal id As Integer) As ActionResult
-            Dim std = studentList.Where(Function(item) item.StudentId = id).FirstOrDefault()
+            Dim std = db.Students.Where(Function(s) s.studentID = id).FirstOrDefault()
 
             Return View(std)
         End Function
@@ -21,18 +22,14 @@ Namespace Controllers
         Function Edit(ByVal std As Student) As ActionResult
 
             'Edit data
-            Dim student = studentList.Where(Function(item) item.StudentId = std.StudentId).FirstOrDefault()
-            studentList.Remove(student)
-            studentList.Add(std)
-
+            Dim student = db.Students.Where(Function(s) s.studentID = std.studentID).First()
+            student.studentID = std.studentID
+            student.studentName = std.studentName
+            student.age = std.age
+            student.standardID = std.standardID
+            db.SaveChanges()
             Return RedirectToAction("Index")
         End Function
-        Private studentList As IList(Of Student) = New List(Of Student)() From {
-            New Student() With {.StudentId = 1, .StudentName = "Thanh", .Age = 15},
-            New Student() With {.StudentId = 2, .StudentName = "Hoang", .Age = 15},
-            New Student() With {.StudentId = 3, .StudentName = "Trang", .Age = 15},
-            New Student() With {.StudentId = 4, .StudentName = "Phong", .Age = 15},
-            New Student() With {.StudentId = 5, .StudentName = "Hoa", .Age = 15}
-            }
+
     End Class
 End Namespace
